@@ -10,11 +10,11 @@ We deploy multiple Memcached servers as storage servers and Libmemcached as the 
   - test SET for n times, GET for n times, DELETE for n times, in order
 - The results of two ways of testing are not much different.
 
-### Installation of the memcached servers
+### Installation of the Memcached servers
 
-In each physical machine that runs as a memcached server, do the following.
+In each physical machine that runs as a Memcached server, do the following.
 
-- Downloading the sourcecode of memcached server:
+- Downloading the sourcecode of Memcached server:
 
 https://memcached.org/downloads
 
@@ -27,8 +27,18 @@ $tar -zvxf memcached-1.5.20.tar.gz
 - Entering the memcached directory, compling and installing:
 
 ```
-$./configure --prefix=$(pwd)
+$./configure --prefix=$(install_dir1)
 $make & sudo make install
+```
+
+- Configure environment variables 
+
+  - Run the following commands. (Temporary)
+
+  - Or add them  to `~/.bashrc` and run `source ~/.bashrc`. (Permanent)
+
+```
+$ export PATH=$(install_dir1)/bin:$PATH
 ```
 
 ### Installation of Libmemcached
@@ -37,20 +47,29 @@ $make & sudo make install
 
 ```
 $ cd libmemcached-1.0.18/
-$ ./configure --prefix=$(pwd)
+$ ./configure --prefix=$(install_dir2)
 $ make & sudo make install
 ```
 
-- entering testbed/ directory, compiling  the test file
+- Configure environment variables 
+  - Run the following commands. (Temporary)
+  - Or add them  to `~/.bashrc` and run `source ~/.bashrc`. (Permanent)
+
+```
+$ export PATH=$(install_dir2)/bin:$PATH
+$ export LD_LIBRARY_PATH=$(install_dir2)/lib:$LD_LIBRARY_PATH
+```
+
+- Entering testbed/ directory, compiling  the test file
 
 ```
 $ make
 ```
 
-> If there is a compiling error which notes that there is no 'lrc_placement.h' included, then
+> If there is a compiling error which notes that there is no `lrc_placement.h` included, then
 >
 > ```
-> $ sudo cp libmemcached-1.0.18/libmemcached-1.0/types/lrc_placement.h /usr/local/include/libmemcached-1.0/types/lrc_placement.h
+> $ cp libmemcached-1.0.18/libmemcached-1.0/types/lrc_placement.h $(your_install_dir)/include/libmemcached-1.0/types/lrc_placement.h
 > ```
 >
 > Notes that the path maybe different in different system.
@@ -63,25 +82,13 @@ $ ./test n k r lrc_scheme placement_scheme value_size
 
 - parameters
 
-  - lrc_num: 0 - Azure-LRC, 1 - Azure-LRC+1
-  - placement_scheme: 0 - flat_placement, 1 - random_placement, 2 - best_placement
-  - value_size: the size of value(Kbytes)
+  - `lrc_scheme`:  `0` - Azure-LRC, `1` - Azure-LRC+1
+  - `placement_scheme`: `0` - flat placement, `1` - random placement, `2` - best_placement
+  - `value_size`: the size of value(Kbytes)
 
 - example
 
   - ```
     $ ./test 16 10 5 0 2 1
     ```
-
-> When you run the program,  if there is an error like
->
-> ```
-> ./test: error while loading shared libraries: libmemcached.so.11: cannot open shared object file: No such file or directory
-> ```
->
-> then
->
-> ```
-> export LD_LIBRARY_PATH=/usr/local/(libmemcached/)lib/:$LD_LIBRARY_PATH
-> ```
 
